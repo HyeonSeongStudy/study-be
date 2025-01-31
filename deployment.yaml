@@ -6,7 +6,7 @@ kind: Deployment
 metadata:
   name: spring-deployment
 
-# 레플리카스 로 Pod 개수 명시
+# 레플리카스 로 Pod 개수 명시 (만약 서버 개수를 늘리고 싶을 때 그냥 숫자만 바꾸면 됨)
 # Deployment 세부 정보
 spec:
   replicas: 3
@@ -21,6 +21,7 @@ spec:
       labels:
         app: backend-app
 
+# 새로운 기능을 빌드하고 싶을 때 이미지 빌드하고 image 버전만 수정하면 된다.
     spec:
       containers:
         - name: spring-pod
