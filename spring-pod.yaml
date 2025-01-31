@@ -1,0 +1,18 @@
+# 매니페스트 파일 (Manifest File)
+
+#공식 문서 파드 사용하기 위한 설정
+apiVersion: v1
+kind: Pod
+
+#기본적 정보 기재
+metadata:
+  name: spring-pod
+
+# Pod에 대한 구체적 정보 제시 # 포트는 단순히 문서화.
+spec:
+  containers:
+    - name: spring-container
+      image: spring-server
+      imagePullPolicy: Never
+      ports:
+        - containerPort: 8080
