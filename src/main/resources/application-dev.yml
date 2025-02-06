@@ -1,0 +1,16 @@
+spring:
+  application:
+    name: minio-test
+
+# Minio server configuration
+minio:
+  server:
+    url: ${MINIO_SERVER_URL:http://localhost:9000}
+    access-key: ${MINIO_SERVER_ACCESS_KEY:minioadmin}
+    secret-key: ${MINIO_SERVER_SECRET_KEY:minioadmin123}
+    bucket: ${MINIO_BUCKET_NAME:files}
+
+# Server Configuration
+server:
+  port: 8088
+  address: 0.0.0.0
