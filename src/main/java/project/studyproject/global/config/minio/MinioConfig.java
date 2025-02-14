@@ -1,4 +1,4 @@
-package project.studyproject.global.configuration;
+package project.studyproject.global.config.minio;
 
 import io.minio.MinioClient;
 import org.springframework.beans.factory.annotation.Value;
@@ -18,7 +18,8 @@ public class MinioConfig {
 
     @Bean
     public MinioClient minioClient() {
-        return MinioClient.builder().endpoint(minioUrl)
+        return MinioClient.builder()
+                .endpoint(minioUrl)
                 .credentials(accessKey, secretKey).
                 build();
     }

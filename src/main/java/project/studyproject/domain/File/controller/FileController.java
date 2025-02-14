@@ -1,4 +1,4 @@
-package project.studyproject.domain.controller;
+package project.studyproject.domain.File.controller;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.core.io.InputStreamResource;
@@ -7,7 +7,7 @@ import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
-import project.studyproject.domain.service.FileService;
+import project.studyproject.domain.File.service.FileService;
 
 import java.io.InputStream;
 
