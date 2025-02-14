@@ -52,4 +52,14 @@ public class User implements UserDetails {
     public String getUsername() {
         return "";
     }
+
+    public static User from (String uid, String password, String name, String roles) {
+        return User.builder()
+                .uid(uid)
+                .password(password)
+                .name(name)
+                .roles(roles)
+                .build();
+    }
+
 }
