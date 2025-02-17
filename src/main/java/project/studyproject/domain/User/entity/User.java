@@ -9,7 +9,6 @@ import lombok.NoArgsConstructor;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
-import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
@@ -18,7 +17,7 @@ import java.util.List;
 @AllArgsConstructor
 @NoArgsConstructor
 @Builder
-@Table
+@Table(name = "Member")
 public class User implements UserDetails {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -34,9 +33,9 @@ public class User implements UserDetails {
     @Column(nullable = false)
     private String name;
 
-    @ElementCollection(fetch = FetchType.EAGER)
-    @Builder.Default
-    private List<String> roles = new ArrayList<>();
+    @Column(nullable = false)
+    @Enumerated(EnumType.STRING)
+    private Role role;
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
@@ -45,21 +44,29 @@ public class User implements UserDetails {
 
     @Override
     public String getPassword() {
-        return "";
+        return this.password;
     }
 
     @Override
     public String getUsername() {
-        return "";
+        return this.uid;
     }
 
-    public static User from (String uid, String password, String name, String roles) {
+    public static User from (String uid, String password, String name) {
         return User.builder()
                 .uid(uid)
                 .password(password)
                 .name(name)
-                .roles(roles)
+                .role(Role.Client)
                 .build();
     }
 
+    //== 회원가입시, USER의 권한을 부여 ==//
+    public void addUserAuthority() {
+        this.role = Role.Client;
+    }
+
+    public void addAdminAuthority() {
+        this.role = Role.Admin;
+    }
 }
