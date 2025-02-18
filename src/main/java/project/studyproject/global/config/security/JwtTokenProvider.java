@@ -8,36 +8,33 @@ import jakarta.annotation.PostConstruct;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
-import org.springframework.security.core.userdetails.User;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Component;
-import project.studyproject.domain.User.service.UserService;
+import project.studyproject.domain.User.entity.Role;
+import project.studyproject.domain.User.service.UserDetailService;
 
 import java.nio.charset.StandardCharsets;
 import java.util.Base64;
 import java.util.Date;
-import java.util.List;
 
 @Component // 애플케이션이 가동되면서 빈으로 자동 주입
 @RequiredArgsConstructor
 @Slf4j
 public class JwtTokenProvider {
-    private final UserService userService;
+    private final UserDetailService userDetailService;
 
     // 시크릿 키 가져오기
-    @Value("${springboot.jwt.secret}")
-    private String secretKey;
+    private String secretKey = "secretKeydasdadasdqudhiw189280391283814djskad";
 
     // 유효기간
     private final Long tokenValidityInSeconds = 1000L * 60 * 60 * 24 * 7;
 
     /**
-     *  해당 객체가 빈 객체로 주입된 이후 수행되는 메서드를 가르킴
-     *  가동 -> 빈으로 자동 주입 -> init 메서드 자동 실행
-     *  secretKey를 base64 형식으로 인코딩
+     * 해당 객체가 빈 객체로 주입된 이후 수행되는 메서드를 가르킴
+     * 가동 -> 빈으로 자동 주입 -> init 메서드 자동 실행
+     * secretKey를 base64 형식으로 인코딩
      */
     @PostConstruct
     protected void init() {
@@ -50,15 +47,15 @@ public class JwtTokenProvider {
      * JWT 토큰 내용에 값을 넣기 위해 Claims 객체 생성
      * sub 속성에 값을 넣기 위해 고유값인 uid 넣어야함
      * 해당 토큰 사용하는 사용자의 권한 확인 role 값 추가
+     *
      * @param userUid
-     * @param roles
+     * @param role
      * @return
      */
-    public String createToken(String userUid, List<String> roles) {
+    public String createToken(String userUid, Role role) {
         log.info("[createToken] 토큰 생성 시작");
 
         Claims claims = Jwts.claims().setSubject(userUid);
-        claims.put("roles", roles);
 
         Date now = new Date();
         String token = Jwts.builder()
@@ -75,18 +72,20 @@ public class JwtTokenProvider {
     /**
      * 필터에서 인증이 성공했을 때 SecurityContextHolder에 저장할 인가를 생성
      * 토큰 클래스를 사용하려면 초기화를 위한 User가 필요함
+     *
      * @param token
      * @return
      */
     public Authentication getAuthentication(String token) {
         log.info("[getAuthentication] 토큰 인증 정보 조회 시작");
-        User user = userService.loadUserByUsername(this.getUserName(token));
+        UserDetails user = userDetailService.loadUserByUsername(this.getUserName(token));
         log.info("[getAuthentication] 토큰 인증 정보 조회 완료, UserName : {}", user.getUsername());
         return new UsernamePasswordAuthenticationToken(user, "", user.getAuthorities());
     }
 
     /**
      * User Detail 가져옴
+     *
      * @param token
      * @return
      */
@@ -100,6 +99,7 @@ public class JwtTokenProvider {
 
     /**
      * 클라이언트가 헤더를 통해 애플리케이션 서버로 JWT 토큰 값을 전다랳야 정상적인 추출이 가능하다.
+     *
      * @param request
      * @return
      */
@@ -110,12 +110,13 @@ public class JwtTokenProvider {
 
     /**
      * 토큰을 전달받아 클레임의 유효 기간을 체크하고 boolean 타입의 값을 리턴하는 역할을 한다.
+     *
      * @param token
      * @return
      */
     public boolean validateToken(String token) {
         log.info("[validateToken] 토큰 유효 체크 시작");
-        try{
+        try {
             Jws<Claims> claims = Jwts.parser().setSigningKey(secretKey).parseClaimsJws(token);
 
             return !claims.getBody().getExpiration().before(new Date());

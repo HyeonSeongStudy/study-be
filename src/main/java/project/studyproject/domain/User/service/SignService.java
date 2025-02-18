@@ -1,10 +1,10 @@
 package project.studyproject.domain.User.service;
 
-import project.studyproject.domain.User.dto.UserResponse;
+import project.studyproject.domain.User.dto.SignInResponse;
 
 public interface SignService {
 
-    UserResponse signUp(String id, String password, String name, String role);
+    void signUp(String id, String password, String name);
 
-    UserResponse signIn(String id, String password);
+    SignInResponse signIn(String id, String password);
 }

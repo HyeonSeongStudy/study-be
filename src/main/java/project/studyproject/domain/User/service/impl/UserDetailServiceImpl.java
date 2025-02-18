@@ -2,15 +2,13 @@ package project.studyproject.domain.User.service.impl;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.security.core.userdetails.User;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
-import project.studyproject.domain.User.Repository.UserRepository;
+import project.studyproject.domain.User.repository.UserRepository;
 import project.studyproject.domain.User.service.UserDetailService;
 
 @Service
-@Transactional(readOnly = true)
 @RequiredArgsConstructor
 @Slf4j
 public class UserDetailServiceImpl implements UserDetailService {
@@ -18,7 +16,7 @@ public class UserDetailServiceImpl implements UserDetailService {
     private final UserRepository userRepository;
 
     @Override
-    public User loadUserByUsername(String username) throws UsernameNotFoundException {
+    public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
 
         log.info("loadUserByUsername : " + username);
 

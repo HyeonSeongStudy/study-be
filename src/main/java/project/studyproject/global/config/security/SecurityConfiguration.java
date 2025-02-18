@@ -31,8 +31,7 @@ public class SecurityConfiguration {
                 .authorizeHttpRequests(authorize ->
                         authorize
                                 .requestMatchers("/swagger", "/swagger-ui.html", "/swagger-ui/**", "/api-docs", "/api-docs/**", "/v3/api-docs/**").permitAll()
-                                .requestMatchers("/sign-api/sign-in", "/sign-api/sign-up",
-                                        "/sign-api/exception").permitAll()
+                                .requestMatchers("/api/v1/user/signIn", "/api/v1/user/signUp").permitAll()
                                 .requestMatchers(HttpMethod.GET, "/product/**").permitAll()
                                 .requestMatchers("**exception**").permitAll()
                                 .anyRequest().hasRole("ADMIN"))

@@ -3,7 +3,7 @@ spring:
     name: minio-test
 
   jwt:
-    secret: secretKey
+    secret: secretKeydsa81821jdsad1jx
 
 # Minio server configuration
 minio:

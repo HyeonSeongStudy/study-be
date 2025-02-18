@@ -1,4 +1,9 @@
 package project.studyproject.domain.User.dto;
 
-public class SignInResponse {
+public record SignInResponse(
+       String token
+) {
+    public static SignInResponse of(String token) {
+        return new SignInResponse(token);
+    }
 }
