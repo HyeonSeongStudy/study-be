@@ -2,6 +2,10 @@ spring:
   application:
     name: minio-test
 
+  servlet:
+    session:
+      timeout: 90m
+
   jwt:
     secret: secretKeydsa81821jdsad1jx
 

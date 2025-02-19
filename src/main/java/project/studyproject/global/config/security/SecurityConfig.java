@@ -3,11 +3,15 @@ package project.studyproject.global.config.security;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.security.access.hierarchicalroles.RoleHierarchy;
+import org.springframework.security.access.hierarchicalroles.RoleHierarchyImpl;
+import org.springframework.security.config.Customizer;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityCustomizer;
 import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
 import org.springframework.security.config.http.SessionCreationPolicy;
+import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.web.SecurityFilterChain;
 
 @Configuration
@@ -40,10 +44,22 @@ public class SecurityConfig {
                 .sessionManagement(httpSecuritySessionManagementConfigurer ->
                         httpSecuritySessionManagementConfigurer.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 // 세션 사용하지 않음
+                // API 호출은 세션을 무상태성으로 관리하기 때문에 disable 가능합니다.
+
+//                .sessionManagement((auth) -> auth
+//                        .maximumSessions(1)
+//                        .maxSessionsPreventsLogin(true)) // 초과시 새로운 로그인 차단
+//
+//                .sessionManagement((auth) -> auth
+//                        .sessionFixation((sessionFixation) -> sessionFixation.changeSessionId())) // 로그인 시 세션 id 새로 생성
+
+//                .formLogin((auth) -> auth.loginPage("/login")
+//                        .loginProcessingUrl("/login").permitAll()) // 기본 로그인 활성화
+
+//                .httpBasic(Customizer.withDefaults()) // http 헤더에 시큐리티 값을 넣음
+
                 .httpBasic(AbstractHttpConfigurer::disable) // 기본 인증 로그인 비활성화
-                // .formLogin(AbstractHttpConfigurer::disable) // 기본 로그인 폼 비활성화
-                .formLogin((auth) -> auth.loginPage("/login")
-                        .loginProcessingUrl("/login").permitAll()) // 기본 로그인 활성화
+                .formLogin(AbstractHttpConfigurer::disable) // 기본 로그인 폼 비활성화
                 .logout(AbstractHttpConfigurer::disable) // 기본 로그아웃 비활성화
 
                 // request 인증,인가 설정
@@ -66,5 +82,17 @@ public class SecurityConfig {
 //                                .accessDeniedHandler(new CustomAccessDeniedHandler()));
 
         return httpSecurity.build();
+    }
+
+    // 여기다가 UserDetailsService를 작성하면 인메모리 방식으로 시큐리티를 구성할 수 있음
+
+    // 계층 권한
+    // 권한이 많이질 때 개행을 하고 표시한다.
+    @Bean
+    public RoleHierarchy roleHierarchy() {
+        return RoleHierarchyImpl.fromHierarchy(
+                """
+                        ROLE_ADMIN > ROLE_CLIENT"""
+        );
     }
 }
