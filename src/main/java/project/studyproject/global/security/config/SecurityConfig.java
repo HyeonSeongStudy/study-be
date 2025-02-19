@@ -1,48 +1,41 @@
-package project.studyproject.global.config.security;
+package project.studyproject.global.security.config;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.access.hierarchicalroles.RoleHierarchy;
 import org.springframework.security.access.hierarchicalroles.RoleHierarchyImpl;
-import org.springframework.security.config.Customizer;
+import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityCustomizer;
 import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
 import org.springframework.security.config.http.SessionCreationPolicy;
-import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.web.SecurityFilterChain;
+import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
+import project.studyproject.global.security.jwt.JWTFilter;
+import project.studyproject.global.security.jwt.JWTUtil;
+import project.studyproject.global.security.jwt.LoginFilter;
+import project.studyproject.global.security.JwtTokenProvider;
 
 @Configuration
 @RequiredArgsConstructor
 @EnableWebSecurity // Spring Security에 대한 디버깅 모드를 사용하기 위한 어노테이션 (default : false)
 public class SecurityConfig {
 
+    private final AuthenticationConfiguration authenticationConfiguration;
+    private final JWTUtil jwtUtil;
     private final JwtTokenProvider jwtTokenProvider;
-//    private final OAuth2SuccessHandler oAuth2SuccessHandler;
-//    private final CustomOAuth2UserService oAuth2UserService;
 
-    /**
-     * Security를 적용하지 않을 리소스
-     * error endpoint를 열여줘야 함
-     *
-     * @return
-     */
     @Bean
-    public WebSecurityCustomizer webSecurityCustomizer() {
-        return web -> web.ignoring()
-                .requestMatchers("/error", "/favicon.ico");
+    public AuthenticationManager authenticationManagerBean(AuthenticationConfiguration configuration) throws Exception {
+        return configuration.getAuthenticationManager();
     }
 
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity httpSecurity) throws Exception {
         httpSecurity
-                .csrf(AbstractHttpConfigurer::disable) // csrf 비활성화 -> cookie를 사용하지 않으면 꺼도 된다.
-                .cors(AbstractHttpConfigurer::disable) // cors 비활성화 -> 프론트와 연결 시 따로 설정 필요함
-
-                .sessionManagement(httpSecuritySessionManagementConfigurer ->
-                        httpSecuritySessionManagementConfigurer.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 // 세션 사용하지 않음
                 // API 호출은 세션을 무상태성으로 관리하기 때문에 disable 가능합니다.
 
@@ -58,8 +51,15 @@ public class SecurityConfig {
 
 //                .httpBasic(Customizer.withDefaults()) // http 헤더에 시큐리티 값을 넣음
 
+
+                .csrf(AbstractHttpConfigurer::disable) // csrf 비활성화 -> cookie를 사용하지 않으면 꺼도 된다.
+                .cors(AbstractHttpConfigurer::disable) // cors 비활성화 -> 프론트와 연결 시 따로 설정 필요함
+
+                .sessionManagement(httpSecuritySessionManagementConfigurer ->
+                        httpSecuritySessionManagementConfigurer.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
+
                 .httpBasic(AbstractHttpConfigurer::disable) // 기본 인증 로그인 비활성화
-                .formLogin(AbstractHttpConfigurer::disable) // 기본 로그인 폼 비활성화
+                .formLogin(AbstractHttpConfigurer::disable) // 기본 로그인 폼 비활성화 -> UserNamePasswordAuthentication Fileter를 커스텀해야함
                 .logout(AbstractHttpConfigurer::disable) // 기본 로그아웃 비활성화
 
                 // request 인증,인가 설정
@@ -70,7 +70,12 @@ public class SecurityConfig {
                                 .requestMatchers("**exception**").permitAll()
                                 .requestMatchers("/admin").hasRole("ADMIN")
                                 .anyRequest().authenticated()
-                );
+                )
+
+                .addFilterBefore(new JWTFilter(jwtUtil), LoginFilter.class)
+                .addFilterAt(new LoginFilter(authenticationManagerBean(authenticationConfiguration), jwtUtil), UsernamePasswordAuthenticationFilter.class);
+                // UserNameAuthentication 필터를 대치해서 사용함
+
 
 //                // jwt 관련 설정
 //                .addFilterBefore(new JwtAuthenticationFilter(jwtTokenProvider), UsernamePasswordAuthenticationFilter.class)
@@ -94,5 +99,17 @@ public class SecurityConfig {
                 """
                         ROLE_ADMIN > ROLE_CLIENT"""
         );
+    }
+
+    /**
+     * Security를 적용하지 않을 리소스
+     * error endpoint를 열여줘야 함
+     *
+     * @return
+     */
+    @Bean
+    public WebSecurityCustomizer webSecurityCustomizer() {
+        return web -> web.ignoring()
+                .requestMatchers("/error", "/favicon.ico");
     }
 }

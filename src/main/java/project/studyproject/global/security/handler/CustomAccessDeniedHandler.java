@@ -1,4 +1,4 @@
-package project.studyproject.global.config.security;
+package project.studyproject.global.security.handler;
 
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;

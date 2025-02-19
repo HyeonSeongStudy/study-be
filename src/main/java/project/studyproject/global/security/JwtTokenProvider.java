@@ -1,4 +1,4 @@
-package project.studyproject.global.config.security;
+package project.studyproject.global.security;
 
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jws;
@@ -13,7 +13,6 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Component;
 import project.studyproject.domain.User.entity.Role;
-import project.studyproject.domain.User.service.UserDetailService;
 
 import java.nio.charset.StandardCharsets;
 import java.util.Base64;
@@ -23,10 +22,9 @@ import java.util.Date;
 @RequiredArgsConstructor
 @Slf4j
 public class JwtTokenProvider {
-    private final UserDetailService userDetailService;
 
     // 시크릿 키 가져오기
-    private String secretKey = "secretKeydasdadasdqudhiw189280391283814djskad";
+    private String secretKey;
 
     // 유효기간
     private final Long tokenValidityInSeconds = 1000L * 60 * 60 * 24 * 7;
@@ -53,20 +51,21 @@ public class JwtTokenProvider {
      * @return
      */
     public String createToken(String userUid, Role role) {
-        log.info("[createToken] 토큰 생성 시작");
-
-        Claims claims = Jwts.claims().setSubject(userUid);
-
-        Date now = new Date();
-        String token = Jwts.builder()
-                .setClaims(claims)
-                .setIssuedAt(now)
-                .setExpiration(new Date(now.getTime() + tokenValidityInSeconds))
-                .signWith(SignatureAlgorithm.HS256, secretKey) // 암호화 알고리즘
-                .compact();
-
-        log.info("[createToken] 토큰 생성 완료");
-        return token;
+//        log.info("[createToken] 토큰 생성 시작");
+//
+////        Claims claims = Jwts.claims().setSubject(userUid);
+//
+//        Date now = new Date();
+//        String token = Jwts.builder()
+//                .setClaims(claims)
+//                .setIssuedAt(now)
+//                .setExpiration(new Date(now.getTime() + tokenValidityInSeconds))
+//                .signWith(SignatureAlgorithm.HS256, secretKey) // 암호화 알고리즘
+//                .compact();
+//
+//        log.info("[createToken] 토큰 생성 완료");
+//        return token;
+        return "";
     }
 
     /**
@@ -77,10 +76,11 @@ public class JwtTokenProvider {
      * @return
      */
     public Authentication getAuthentication(String token) {
-        log.info("[getAuthentication] 토큰 인증 정보 조회 시작");
-        UserDetails user = userDetailService.loadUserByUsername(this.getUserName(token));
-        log.info("[getAuthentication] 토큰 인증 정보 조회 완료, UserName : {}", user.getUsername());
-        return new UsernamePasswordAuthenticationToken(user, "", user.getAuthorities());
+//        log.info("[getAuthentication] 토큰 인증 정보 조회 시작");
+//        //UserDetails user = userDetailService.loadUserByUsername(this.getUserName(token));
+//        log.info("[getAuthentication] 토큰 인증 정보 조회 완료, UserName : {}", user.getUsername());
+//        return new UsernamePasswordAuthenticationToken(user, "", user.getAuthorities());
+        return null;
     }
 
     /**
@@ -91,10 +91,10 @@ public class JwtTokenProvider {
      */
     public String getUserName(String token) {
         log.info("[getUserName] 토큰 기반 회원 구별 정보 추출");
-        String info = Jwts.parser().setSigningKey(secretKey).parseClaimsJws(token).getBody().getSubject();
-        log.info("[getUserName] 토큰 기반 회원 구별 정보 추출 완료, {}", info);
-        return info;
-
+        //String info = Jwts.parser().setSigningKey(secretKey).parseClaimsJws(token).getBody().getSubject();
+        //log.info("[getUserName] 토큰 기반 회원 구별 정보 추출 완료, {}", info);
+        //return info;
+        return null;
     }
 
     /**
@@ -117,14 +117,16 @@ public class JwtTokenProvider {
     public boolean validateToken(String token) {
         log.info("[validateToken] 토큰 유효 체크 시작");
         try {
-            Jws<Claims> claims = Jwts.parser().setSigningKey(secretKey).parseClaimsJws(token);
+            //Jws<Claims> claims = Jwts.parser().setSigningKey(secretKey).parseClaimsJws(token);
 
-            return !claims.getBody().getExpiration().before(new Date());
+            //return !claims.getBody().getExpiration().before(new Date());
         } catch (Exception e) {
             log.info("[validateToken] 토큰 유효 체크 예외 발생");
             return false;
         }
+        return false;
     }
+
 
 
 }

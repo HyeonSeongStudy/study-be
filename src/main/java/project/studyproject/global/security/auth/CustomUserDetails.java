@@ -1,4 +1,4 @@
-package project.studyproject.domain.User.dto;
+package project.studyproject.global.security.auth;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.GrantedAuthority;
@@ -9,13 +9,9 @@ import java.util.ArrayList;
 import java.util.Collection;
 
 @RequiredArgsConstructor
-public class UserDetailsDto implements UserDetails {
+public class CustomUserDetails implements UserDetails {
 
-    public UserDetailsDto(User user) {
-        this.user = user;
-    }
-
-    private User user;
+    private final User user;
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {

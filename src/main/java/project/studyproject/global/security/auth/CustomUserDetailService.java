@@ -1,18 +1,17 @@
-package project.studyproject.domain.User.service.impl;
+package project.studyproject.global.security.auth;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
-import project.studyproject.domain.User.dto.UserDetailsDto;
 import project.studyproject.domain.User.repository.UserRepository;
-import project.studyproject.domain.User.service.UserDetailService;
 
 @Service
 @RequiredArgsConstructor
 @Slf4j
-public class UserDetailServiceImpl implements UserDetailService {
+public class CustomUserDetailService implements UserDetailsService {
 
     private final UserRepository userRepository;
 
@@ -21,6 +20,6 @@ public class UserDetailServiceImpl implements UserDetailService {
 
         log.info("loadUserByUsername : " + username);
 
-        return new UserDetailsDto(userRepository.getByUid(username));
+        return new CustomUserDetails(userRepository.getByUsername(username));
     }
 }

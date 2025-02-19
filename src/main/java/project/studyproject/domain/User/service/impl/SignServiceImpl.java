@@ -11,7 +11,7 @@ import project.studyproject.domain.User.dto.SignInResponse;
 import project.studyproject.domain.User.entity.User;
 import project.studyproject.domain.User.repository.UserRepository;
 import project.studyproject.domain.User.service.SignService;
-import project.studyproject.global.config.security.JwtTokenProvider;
+import project.studyproject.global.security.JwtTokenProvider;
 
 import java.util.Collection;
 import java.util.Iterator;
@@ -27,7 +27,7 @@ public class SignServiceImpl implements SignService {
     @Override
     public void signUp(String id, String password, String name) {
         log.info("[signUp] 회원가입 시작");
-        if (userRepository.existsByUid(id)){
+        if (userRepository.existsByUsername(id)){
             log.info("[signUp] 아이디 중복");
             return;
         }
@@ -53,14 +53,14 @@ public class SignServiceImpl implements SignService {
     @Override
     public SignInResponse signIn(String id, String password) {
         log.info("[singIn] 로그인 시작");
-        User user = userRepository.getByUid(id);
+        User user = userRepository.getByUsername(id);
         log.info("[signIn] 회원정보 가져오기");
         if (!passwordEncoder.matches(password, user.getPassword())) {
             throw new RuntimeException();
         }
         log.info("[signIn] 비밀번호 일치");
 
-        String token = jwtTokenProvider.createToken(String.valueOf(user.getUid()), user.getRole());
+        String token = jwtTokenProvider.createToken(String.valueOf(user.getUsername()), user.getRole());
 
         log.info("[signIn] 해당 토큰 : {}", token);
 

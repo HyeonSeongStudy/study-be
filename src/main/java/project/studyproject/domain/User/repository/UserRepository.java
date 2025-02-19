@@ -8,8 +8,8 @@ import project.studyproject.domain.User.entity.User;
 public interface UserRepository extends JpaRepository<User, Long> {
 
     // 특정 데이터 찾기
-    User getByUid(String uid);
+    User getByUsername(String username);
 
     // 이메일 중복 로직
-    boolean existsByUid(String uid);
+    boolean existsByUsername(String uid);
 }

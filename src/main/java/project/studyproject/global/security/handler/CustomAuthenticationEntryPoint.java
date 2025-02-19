@@ -1,4 +1,4 @@
-package project.studyproject.global.config.security;
+package project.studyproject.global.security.handler;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.servlet.ServletException;

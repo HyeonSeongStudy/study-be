@@ -24,7 +24,7 @@ public class User implements UserDetails {
     private Long id;
 
     @Column(unique = true, nullable = false)
-    private String uid;
+    private String username;
 
     @JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
     @Column(nullable = false)
@@ -49,12 +49,12 @@ public class User implements UserDetails {
 
     @Override
     public String getUsername() {
-        return this.uid;
+        return this.username;
     }
 
-    public static User from (String uid, String password, String name) {
+    public static User from (String username, String password, String name) {
         return User.builder()
-                .uid(uid)
+                .username(username)
                 .password(password)
                 .name(name)
                 .role(Role.Client)
