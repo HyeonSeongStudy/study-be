@@ -32,18 +32,6 @@ public class SignServiceImpl implements SignService {
             return;
         }
 
-        /**
-         * 검증 로직
-         */
-        SecurityContextHolder.getContext().getAuthentication().getName();
-
-        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-
-        Collection<? extends GrantedAuthority> authorities = authentication.getAuthorities();
-        Iterator<? extends GrantedAuthority> iter = authorities.iterator();
-        GrantedAuthority auth = iter.next();
-        String role = auth.getAuthority();
-
         User user = User.from(id, passwordEncoder.encode(password), name);
         user.addAdminAuthority();
 

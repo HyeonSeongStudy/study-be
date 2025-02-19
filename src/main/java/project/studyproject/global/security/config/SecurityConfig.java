@@ -14,6 +14,7 @@ import org.springframework.security.config.annotation.web.configurers.AbstractHt
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
+import project.studyproject.domain.User.repository.RefreshRepository;
 import project.studyproject.global.security.jwt.JWTFilter;
 import project.studyproject.global.security.jwt.JWTUtil;
 import project.studyproject.global.security.jwt.LoginFilter;
@@ -26,6 +27,7 @@ public class SecurityConfig {
 
     private final AuthenticationConfiguration authenticationConfiguration;
     private final JWTUtil jwtUtil;
+    private final RefreshRepository refreshRepository;
     private final JwtTokenProvider jwtTokenProvider;
 
     @Bean
@@ -73,7 +75,7 @@ public class SecurityConfig {
                 )
 
                 .addFilterBefore(new JWTFilter(jwtUtil), LoginFilter.class)
-                .addFilterAt(new LoginFilter(authenticationManagerBean(authenticationConfiguration), jwtUtil), UsernamePasswordAuthenticationFilter.class);
+                .addFilterAt(new LoginFilter(authenticationManagerBean(authenticationConfiguration), jwtUtil, refreshRepository), UsernamePasswordAuthenticationFilter.class);
                 // UserNameAuthentication 필터를 대치해서 사용함
 
 
