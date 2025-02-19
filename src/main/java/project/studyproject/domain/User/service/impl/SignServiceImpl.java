@@ -2,6 +2,9 @@ package project.studyproject.domain.User.service.impl;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import project.studyproject.domain.User.dto.SignInResponse;
@@ -9,6 +12,9 @@ import project.studyproject.domain.User.entity.User;
 import project.studyproject.domain.User.repository.UserRepository;
 import project.studyproject.domain.User.service.SignService;
 import project.studyproject.global.config.security.JwtTokenProvider;
+
+import java.util.Collection;
+import java.util.Iterator;
 
 @Service
 @RequiredArgsConstructor
@@ -21,8 +27,25 @@ public class SignServiceImpl implements SignService {
     @Override
     public void signUp(String id, String password, String name) {
         log.info("[signUp] 회원가입 시작");
+        if (userRepository.existsByUid(id)){
+            log.info("[signUp] 아이디 중복");
+            return;
+        }
+
+        /**
+         * 검증 로직
+         */
+        SecurityContextHolder.getContext().getAuthentication().getName();
+
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+
+        Collection<? extends GrantedAuthority> authorities = authentication.getAuthorities();
+        Iterator<? extends GrantedAuthority> iter = authorities.iterator();
+        GrantedAuthority auth = iter.next();
+        String role = auth.getAuthority();
+
         User user = User.from(id, passwordEncoder.encode(password), name);
-        user.addUserAuthority();
+        user.addAdminAuthority();
 
         userRepository.save(user);
     }

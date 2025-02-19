@@ -5,6 +5,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
+import project.studyproject.domain.User.dto.UserDetailsDto;
 import project.studyproject.domain.User.repository.UserRepository;
 import project.studyproject.domain.User.service.UserDetailService;
 
@@ -20,6 +21,6 @@ public class UserDetailServiceImpl implements UserDetailService {
 
         log.info("loadUserByUsername : " + username);
 
-        return userRepository.getByUid(username);
+        return new UserDetailsDto(userRepository.getByUid(username));
     }
 }
