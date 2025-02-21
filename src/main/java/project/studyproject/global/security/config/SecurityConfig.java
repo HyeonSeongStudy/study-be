@@ -14,11 +14,15 @@ import org.springframework.security.config.annotation.web.configurers.AbstractHt
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
+import org.springframework.security.web.authentication.logout.LogoutFilter;
 import project.studyproject.domain.User.repository.RefreshRepository;
+import project.studyproject.global.security.filter.CustomLogoutFilter;
+import project.studyproject.global.security.handler.AuthenticationFailHandler;
+import project.studyproject.global.security.handler.AuthenticationRefreshHandler;
+import project.studyproject.global.security.handler.AuthenticationSuccessHandler;
 import project.studyproject.global.security.jwt.JWTFilter;
 import project.studyproject.global.security.jwt.JWTUtil;
 import project.studyproject.global.security.jwt.LoginFilter;
-import project.studyproject.global.security.JwtTokenProvider;
 
 @Configuration
 @RequiredArgsConstructor
@@ -28,7 +32,8 @@ public class SecurityConfig {
     private final AuthenticationConfiguration authenticationConfiguration;
     private final JWTUtil jwtUtil;
     private final RefreshRepository refreshRepository;
-    private final JwtTokenProvider jwtTokenProvider;
+    private final AuthenticationSuccessHandler authenticationSuccessHandler;
+    private final AuthenticationFailHandler authenticationFailureHandler;
 
     @Bean
     public AuthenticationManager authenticationManagerBean(AuthenticationConfiguration configuration) throws Exception {
@@ -68,15 +73,16 @@ public class SecurityConfig {
                 .authorizeHttpRequests(authorize ->
                         authorize
                                 .requestMatchers("/swagger", "/swagger-ui.html", "/swagger-ui/**", "/api-docs", "/api-docs/**", "/v3/api-docs/**").permitAll()
-                                .requestMatchers("/api/v1/user/signIn", "/api/v1/user/signUp").permitAll()
+                                .requestMatchers("/signUp", "/reissue").permitAll()
                                 .requestMatchers("**exception**").permitAll()
                                 .requestMatchers("/admin").hasRole("ADMIN")
                                 .anyRequest().authenticated()
                 )
 
                 .addFilterBefore(new JWTFilter(jwtUtil), LoginFilter.class)
-                .addFilterAt(new LoginFilter(authenticationManagerBean(authenticationConfiguration), jwtUtil, refreshRepository), UsernamePasswordAuthenticationFilter.class);
-                // UserNameAuthentication 필터를 대치해서 사용함
+                .addFilterAt(new LoginFilter(authenticationManagerBean(authenticationConfiguration), jwtUtil, authenticationSuccessHandler, authenticationFailureHandler, refreshRepository), UsernamePasswordAuthenticationFilter.class)
+                .addFilterBefore(new CustomLogoutFilter(jwtUtil, refreshRepository), LogoutFilter.class);
+        // UserNameAuthentication 필터를 대치해서 사용함
 
 
 //                // jwt 관련 설정

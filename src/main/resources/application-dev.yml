@@ -7,7 +7,7 @@ spring:
       timeout: 90m
 
   jwt:
-    secret: secretKeydsa81821jdsad1jx
+    secret: secretKeydsa81821jdsad1jxdjsalkdjasjkj1o2j3kljlkdjlksjldasasdkajsdklj12lj2k3jl1k2oi3nhioxneiodhsaxndhih1o2hiouep2i1soexnhdd
 
   datasource:
     url: jdbc:mysql://localhost:33306/StudyProject?createDatabaseIfNotExist=true
