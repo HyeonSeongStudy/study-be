@@ -1,23 +1,28 @@
 package project.studyproject.global.security.jwt;
 
+import io.jsonwebtoken.ExpiredJwtException;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.filter.OncePerRequestFilter;
+import project.studyproject.domain.User.entity.Role;
 import project.studyproject.domain.User.entity.User;
 import project.studyproject.global.security.auth.CustomUserDetails;
 
 import java.io.IOException;
+import java.io.PrintWriter;
 
 /**
  * Jwt를 검증하고, 사용자 정보를 SecurityContext에 등록하는 역할
  */
 @RequiredArgsConstructor
+@Slf4j
 public class JWTFilter extends OncePerRequestFilter {
 
     private final JWTUtil jwtUtil;
@@ -25,49 +30,23 @@ public class JWTFilter extends OncePerRequestFilter {
     // 접근 제한자
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
+        String accessToken = jwtUtil.resolveToken(request);
+        log.info("[JWTFilter] Extracted token: {}", accessToken);
 
-        // request에서 Authorization 찾음
-        String authHeader = request.getHeader("Authorization");
-
-        // 토큰이 있는지
-        if (authHeader == null || !authHeader.startsWith("Bearer ")) {
-
-            System.out.println("token null");
+        // 토큰이 없으면 다음 필터로 진행
+        if (accessToken == null || jwtUtil.isExpired(accessToken)) {
+            log.warn("[JWTFilter] No valid token found, proceeding without authentication.");
             filterChain.doFilter(request, response);
-
-            //조건이 해당되면 메소드 종료 (필수)
             return;
         }
 
-        String token = authHeader.split(" ")[1];
+        log.info("[JWTFilter] Token validation started.");
+        Authentication authentication = jwtUtil.getAuthentication(accessToken);
 
-        //토큰 소멸 시간 검증
-        if (jwtUtil.isExpired(token)) {
-
-            System.out.println("token expired");
-            filterChain.doFilter(request, response);
-
-            //조건이 해당되면 메소드 종료 (필수)
-            return;
+        if (authentication != null) {
+            SecurityContextHolder.getContext().setAuthentication(authentication);
+            log.info("[JWTFilter] Token validation successful. User authenticated: {}", authentication.getName());
         }
-
-        // 토큰에서 사용자 정보를 추출
-        String username = jwtUtil.getUsername(token);
-        String role = jwtUtil.getRole(token);
-
-        //userEntity를 생성하여 값 set
-        // 원래는 DB를 조회해야함
-        User userEntity = User.from(
-                "userName", "tempPassword", "temp"
-        );
-
-        //UserDetails에 회원 정보 객체 담기
-        CustomUserDetails customUserDetails = new CustomUserDetails(userEntity);
-
-        //스프링 시큐리티 인증 토큰 생성
-        Authentication authToken = new UsernamePasswordAuthenticationToken(customUserDetails, null, customUserDetails.getAuthorities());
-        //세션에 사용자 등록
-        SecurityContextHolder.getContext().setAuthentication(authToken);
 
         filterChain.doFilter(request, response);
 
