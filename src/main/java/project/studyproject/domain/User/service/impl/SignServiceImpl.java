@@ -30,7 +30,7 @@ public class SignServiceImpl implements SignService {
             return;
         }
 
-        User user = User.from(id, passwordEncoder.encode(password), name);
+        User user = User.localFrom(id, passwordEncoder.encode(password), name);
         user.addAdminAuthority();
 
         userRepository.save(user);
