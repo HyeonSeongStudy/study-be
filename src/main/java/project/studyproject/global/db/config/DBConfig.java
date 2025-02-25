@@ -15,9 +15,9 @@ public class DBConfig {
     public DataSource getDataSource(){
         return DataSourceBuilder.create()
                 .driverClassName("")
-                .url("jdbc:mysql://localhost:3306/studyproject")
-                .username("root")
-                .password("123456")
+                .url("")
+                .username("")
+                .password("")
                 .build();
     }
 
