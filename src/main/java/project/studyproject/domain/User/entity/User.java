@@ -6,6 +6,7 @@ import lombok.*;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
@@ -35,12 +36,20 @@ public class User  {
     @Enumerated(EnumType.STRING)
     private Role role;
 
-    public static User from (String username, String password, String name) {
+    public static User localFrom (String username, String password, String name) {
         return User.builder()
                 .username(username)
                 .password(password)
                 .name(name)
                 .role(Role.Client)
+                .build();
+    }
+
+    public static User oauth2From (String username, String name, Role role){
+        return User.builder()
+                .username(username)
+                .name(name)
+                .role(role)
                 .build();
     }
 

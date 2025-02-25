@@ -1,8 +1,10 @@
 package project.studyproject.global.security.config;
 
+import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.security.access.hierarchicalroles.RoleHierarchy;
 import org.springframework.security.access.hierarchicalroles.RoleHierarchyImpl;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -15,14 +17,22 @@ import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 import org.springframework.security.web.authentication.logout.LogoutFilter;
+import org.springframework.web.cors.CorsConfiguration;
+import org.springframework.web.cors.CorsConfigurationSource;
+import project.studyproject.domain.oauth2.service.CustomOauth2UserService;
 import project.studyproject.domain.User.repository.RefreshRepository;
+import project.studyproject.domain.oauth2.util.CustomClientRegistrationRepo;
+import project.studyproject.domain.oauth2.util.CustomOAuth2AuthorizedClientService;
+import project.studyproject.domain.oauth2.util.CustomSuccessHandler;
+import project.studyproject.domain.oauth2.util.JWTFOAuth2Filter;
 import project.studyproject.global.security.filter.CustomLogoutFilter;
 import project.studyproject.global.security.handler.AuthenticationFailHandler;
-import project.studyproject.global.security.handler.AuthenticationRefreshHandler;
 import project.studyproject.global.security.handler.AuthenticationSuccessHandler;
 import project.studyproject.global.security.jwt.JWTFilter;
 import project.studyproject.global.security.jwt.JWTUtil;
 import project.studyproject.global.security.jwt.LoginFilter;
+
+import java.util.Collections;
 
 @Configuration
 @RequiredArgsConstructor
@@ -34,6 +44,14 @@ public class SecurityConfig {
     private final RefreshRepository refreshRepository;
     private final AuthenticationSuccessHandler authenticationSuccessHandler;
     private final AuthenticationFailHandler authenticationFailureHandler;
+
+    // OAuth2
+    private final CustomOauth2UserService customOauth2UserService;
+    private final CustomClientRegistrationRepo customClientRegistrationRepo;
+    private final CustomOAuth2AuthorizedClientService customOAuth2AuthorizedClientService;
+    private final JdbcTemplate jdbcTemplate;
+    private final CustomSuccessHandler customSuccessHandler;
+    private final JWTFOAuth2Filter jwtOAuth2Filter;
 
     @Bean
     public AuthenticationManager authenticationManagerBean(AuthenticationConfiguration configuration) throws Exception {
@@ -60,25 +78,51 @@ public class SecurityConfig {
 
 
                 .csrf(AbstractHttpConfigurer::disable) // csrf 비활성화 -> cookie를 사용하지 않으면 꺼도 된다.
-                .cors(AbstractHttpConfigurer::disable) // cors 비활성화 -> 프론트와 연결 시 따로 설정 필요함
+//                .cors(AbstractHttpConfigurer::disable) // cors 비활성화 -> 프론트와 연결 시 따로 설정 필요함
+                .cors(corsCustomizer -> corsCustomizer.configurationSource(new CorsConfigurationSource() {
+                    @Override
+                    public CorsConfiguration getCorsConfiguration(HttpServletRequest request) {
+                        CorsConfiguration configuration = new CorsConfiguration();
+                        configuration.setAllowedOrigins(Collections.singletonList("http://localhost:3000"));
+                        configuration.setAllowedMethods(Collections.singletonList("*"));
+                        configuration.setAllowCredentials(true);
+                        configuration.setAllowedHeaders(Collections.singletonList("*"));
+                        configuration.setMaxAge(3600L);
+
+                        configuration.setExposedHeaders(Collections.singletonList("Set-Cookie"));
+                        configuration.setExposedHeaders(Collections.singletonList("Authorization"));
+
+                        return configuration;
+                    }
+                }))
 
                 .sessionManagement(httpSecuritySessionManagementConfigurer ->
                         httpSecuritySessionManagementConfigurer.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
 
                 .httpBasic(AbstractHttpConfigurer::disable) // 기본 인증 로그인 비활성화
-                .formLogin(AbstractHttpConfigurer::disable) // 기본 로그인 폼 비활성화 -> UserNamePasswordAuthentication Fileter를 커스텀해야함
                 .logout(AbstractHttpConfigurer::disable) // 기본 로그아웃 비활성화
+                .formLogin(AbstractHttpConfigurer::disable) // 기본 로그인 폼 비활성화 -> UserNamePasswordAuthentication Fileter를 커스텀해야함
+                .oauth2Login(oauth2 -> oauth2
+                        .loginPage("/login")
+                        .clientRegistrationRepository(customClientRegistrationRepo.clientRegistrationRepository()) // yml 파일에 두지 않고 커스텀 형태로 만듬 + 인메모리 형식으로 저장
+                        .authorizedClientService(customOAuth2AuthorizedClientService.oAuth2AuthorizedClientService(jdbcTemplate, customClientRegistrationRepo.clientRegistrationRepository())) // 스프링 OAuth2 클라이언트에서 사용자의 Access 토큰이나 정보를 저장하는 OAuth2AuthorizedClientService를 DB 방식으로 구현하는 방법과 중요한 참고 사항
+                        .userInfoEndpoint((userInfoEndpointConfig) -> userInfoEndpointConfig.userService(customOauth2UserService)) // 유저 처리
+                        .successHandler(customSuccessHandler) // 핸들러
+                        .permitAll()
+                )
 
                 // request 인증,인가 설정
                 .authorizeHttpRequests(authorize ->
                         authorize
                                 .requestMatchers("/swagger", "/swagger-ui.html", "/swagger-ui/**", "/api-docs", "/api-docs/**", "/v3/api-docs/**").permitAll()
                                 .requestMatchers("/signUp", "/reissue").permitAll()
+                                .requestMatchers("/", "/oauth2/**", "/login/**").permitAll()
                                 .requestMatchers("**exception**").permitAll()
                                 .requestMatchers("/admin").hasRole("ADMIN")
                                 .anyRequest().authenticated()
                 )
 
+                .addFilterBefore(new JWTFOAuth2Filter(jwtUtil), UsernamePasswordAuthenticationFilter.class)
                 .addFilterBefore(new JWTFilter(jwtUtil), LoginFilter.class)
                 .addFilterAt(new LoginFilter(authenticationManagerBean(authenticationConfiguration), jwtUtil, authenticationSuccessHandler, authenticationFailureHandler, refreshRepository), UsernamePasswordAuthenticationFilter.class)
                 .addFilterBefore(new CustomLogoutFilter(jwtUtil, refreshRepository), LogoutFilter.class);
