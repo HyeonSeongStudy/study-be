@@ -10,6 +10,9 @@ import org.springframework.stereotype.Component;
 
 import java.io.IOException;
 
+/**
+ * 접근 경로 막혔을 시 표시
+ */
 @Component
 @Slf4j
 public class CustomAccessDeniedHandler implements AccessDeniedHandler {

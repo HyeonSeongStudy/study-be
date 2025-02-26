@@ -14,6 +14,9 @@ import project.studyproject.global.security.jwt.JWTUtil;
 
 import java.io.IOException;
 
+/**
+ * 로그아웃 진행 시 리프레쉬 토큰을 없애서 어쎄스 토큰의 재발급을 막음
+ */
 public class CustomLogoutFilter extends GenericFilterBean {
 
     private final JWTUtil jwtUtil;
@@ -25,6 +28,16 @@ public class CustomLogoutFilter extends GenericFilterBean {
         this.refreshRepository = refreshRepository;
     }
 
+    /**
+     * 매개변수를 HttpServletRequest 가 아닌 ServletRequest 인지
+     * Http 뿐만 아니라 다른 프로토콜도 지원할 수 있도록 만들어짐
+     * HTTP 전용 로직을 별도의 메서드로 분리하면서도 Filter 인터페이스의 기본 시그니처를 준수
+     * @param request
+     * @param response
+     * @param chain
+     * @throws IOException
+     * @throws ServletException
+     */
     @Override
     public void doFilter(ServletRequest request, ServletResponse response, FilterChain chain) throws IOException, ServletException {
 

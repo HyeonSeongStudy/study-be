@@ -5,6 +5,9 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.security.crypto.factory.PasswordEncoderFactories;
 import org.springframework.security.crypto.password.PasswordEncoder;
 
+/**
+ * 비밀번호를 암호화 시키는 역할
+ */
 @Configuration
 public class PasswordEncoderConfig {
 

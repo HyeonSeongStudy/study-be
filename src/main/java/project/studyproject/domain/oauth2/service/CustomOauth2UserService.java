@@ -24,12 +24,14 @@ import project.studyproject.domain.User.repository.UserRepository;
 public class CustomOauth2UserService extends DefaultOAuth2UserService {
     private final UserRepository userRepository;
 
+    // 해당 유저 정보 가져오기
     @Override
     public OAuth2User loadUser(OAuth2UserRequest userRequest) throws OAuth2AuthenticationException {
 
         OAuth2User oAuth2User = super.loadUser(userRequest);
         log.info("[사용자 정보] : {}", oAuth2User.getAttributes());
 
+        // 어떤 사이트에서 가져오는지 확인
         String registrationId = userRequest.getClientRegistration().getRegistrationId();
         OAuth2Response oAuth2Response = null;
         if (registrationId.equals("naver")) {
@@ -43,7 +45,11 @@ public class CustomOauth2UserService extends DefaultOAuth2UserService {
             return null;
         }
 
-        String username = oAuth2Response.getProvider()+" "+oAuth2Response.getProviderId(); // 우리 서버에서 관리 가능하게 만듬
+        // 서버에서 관리 용이하게 임의로 username을 생성
+        String username = oAuth2Response.getProvider()+" "+oAuth2Response.getProviderId();
+
+        // 이미 저장되어있는 데이터 가져오기
+        // 있다면 새롭게 적용, 없다면 새로운 걸 적용
         User existData = userRepository.getByUsername(username);
         if (existData == null) {
 

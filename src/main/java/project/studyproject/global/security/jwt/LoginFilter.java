@@ -33,12 +33,16 @@ public class LoginFilter extends UsernamePasswordAuthenticationFilter {
     @Override
     public Authentication attemptAuthentication(HttpServletRequest request, HttpServletResponse response) {
 
+        // JSON 파싱 로직을 위해 obtain 메서드 사용
         String username = obtainUsername(request);
         String password = obtainPassword(request);
 
+        // 인증 요청 객체 생성 로직 ( 토큰 발급 X )
+        // 인증 매니저에게 "이거 확인해줘" 하는 느낌
         UsernamePasswordAuthenticationToken authRequest = new UsernamePasswordAuthenticationToken(username, password, null);
         log.info("[authRequest] 인증 요청  : {}", authRequest);
 
+        // 인증 처리 책임자 역할 -> SecurityContext 에 저장해서 맞는 애 구나 라고 확인
         return authenticationManager.authenticate(authRequest);
     }
 
@@ -56,3 +60,4 @@ public class LoginFilter extends UsernamePasswordAuthenticationFilter {
     }
 
 }
+

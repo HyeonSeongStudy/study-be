@@ -1,10 +1,12 @@
 package project.studyproject.domain.User.repository;
 
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
 import org.springframework.stereotype.Repository;
 import project.studyproject.domain.User.entity.User;
 
 @Repository
+@EnableJpaRepositories(basePackageClasses = User.class)
 public interface UserRepository extends JpaRepository<User, Long> {
 
     // 특정 데이터 찾기

@@ -122,10 +122,10 @@ public class SecurityConfig {
                                 .anyRequest().authenticated()
                 )
 
-                .addFilterBefore(new JWTFOAuth2Filter(jwtUtil), UsernamePasswordAuthenticationFilter.class)
+                .addFilterBefore(new JWTFOAuth2Filter(jwtUtil), UsernamePasswordAuthenticationFilter.class) // 이거를 이제 JWTFilter 쪽에 얹어야함
                 .addFilterBefore(new JWTFilter(jwtUtil), LoginFilter.class)
                 .addFilterAt(new LoginFilter(authenticationManagerBean(authenticationConfiguration), jwtUtil, authenticationSuccessHandler, authenticationFailureHandler, refreshRepository), UsernamePasswordAuthenticationFilter.class)
-                .addFilterBefore(new CustomLogoutFilter(jwtUtil, refreshRepository), LogoutFilter.class);
+                .addFilterBefore(new CustomLogoutFilter(jwtUtil, refreshRepository), LogoutFilter.class); // 로그아웃 시
         // UserNameAuthentication 필터를 대치해서 사용함
 
 

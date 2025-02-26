@@ -13,6 +13,9 @@ public class CustomUserDetails implements UserDetails {
 
     private final User user;
 
+    /**
+     * 권한 여부
+     */
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
         Collection<GrantedAuthority> collection = new ArrayList<>();
@@ -25,11 +28,17 @@ public class CustomUserDetails implements UserDetails {
         return collection;
     }
 
+    /**
+     * 패스워드 가져오기
+     */
     @Override
     public String getPassword() {
         return user.getPassword();
     }
 
+    /**
+     * 이메일 가져오기
+     */
     @Override
     public String getUsername() {
         return user.getUsername();
