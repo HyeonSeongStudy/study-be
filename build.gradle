@@ -73,6 +73,9 @@ dependencies {
     // Mongo DB
     implementation 'org.springframework.boot:spring-boot-starter-data-mongodb'
 
+    // Spring Batch 5
+    implementation 'org.springframework.boot:spring-boot-starter-batch'
+
 }
 
 tasks.named('test') {

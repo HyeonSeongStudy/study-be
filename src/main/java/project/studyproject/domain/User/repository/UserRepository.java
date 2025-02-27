@@ -6,7 +6,6 @@ import org.springframework.stereotype.Repository;
 import project.studyproject.domain.User.entity.User;
 
 @Repository
-@EnableJpaRepositories(basePackageClasses = User.class)
 public interface UserRepository extends JpaRepository<User, Long> {
 
     // 특정 데이터 찾기
