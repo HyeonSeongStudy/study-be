@@ -7,6 +7,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 import project.studyproject.domain.User.entity.Role;
+import project.studyproject.domain.User.entity.Type;
 import project.studyproject.domain.User.repository.RefreshRepository;
 import project.studyproject.global.security.jwt.JWTUtil;
 
@@ -47,8 +48,8 @@ public class AuthenticationRefreshHandler {
         Role role = jwtUtil.getRole(refresh);
 
         //make new JWT
-        String newAccess = jwtUtil.createToken("access", username, role, 600000L);
-        String newRefresh = jwtUtil.createToken("refresh", username, role, 600000L);
+        String newAccess = jwtUtil.createToken("access", username, role, Type.LOCAL,600000L);
+        String newRefresh = jwtUtil.createToken("refresh", username, role, Type.LOCAL ,600000L);
 
         //Refresh 토큰 저장 DB에 기존의 Refresh 토큰 삭제 후 새 Refresh 토큰 저장
         refreshRepository.deleteByRefreshToken(refresh);
