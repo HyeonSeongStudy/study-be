@@ -21,6 +21,8 @@ public class MetaDBConfig {
         return DataSourceBuilder.create().build();
     }
 
+
+    // 공부하기 싫어요
     @Primary
     @Bean
     public PlatformTransactionManager metaTransactionManager() {
