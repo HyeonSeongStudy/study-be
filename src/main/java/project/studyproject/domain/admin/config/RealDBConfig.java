@@ -4,9 +4,8 @@ import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.boot.jdbc.DataSourceBuilder;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.context.annotation.Primary;
 import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
-import org.springframework.jdbc.datasource.DataSourceTransactionManager;
+import org.springframework.orm.jpa.JpaTransactionManager;
 import org.springframework.orm.jpa.LocalContainerEntityManagerFactoryBean;
 import org.springframework.orm.jpa.vendor.HibernateJpaVendorAdapter;
 import org.springframework.transaction.PlatformTransactionManager;
@@ -25,17 +24,16 @@ public class RealDBConfig {
     @Bean
     @ConfigurationProperties(prefix = "spring.datasource.real")
     public DataSource realDBSource() {
-
         return DataSourceBuilder.create().build();
     }
 
     @Bean
-    public LocalContainerEntityManagerFactoryBean realEntityManagerFactory() {
+    public LocalContainerEntityManagerFactoryBean realEntityManager() {
         LocalContainerEntityManagerFactoryBean em = new LocalContainerEntityManagerFactoryBean();
-
         em.setDataSource(realDBSource());
-        em.setPackagesToScan(new String[]{"project.studyproject.domain.admin.entity"});
-        em. setJpaVendorAdapter(new HibernateJpaVendorAdapter());
+        em.setPackagesToScan("project.studyproject.domain.admin.entity");
+        em.setJpaVendorAdapter(new HibernateJpaVendorAdapter());
+        em.setPersistenceUnitName("realPersistenceUnit");
 
         HashMap<String, Object> properties = new HashMap<>();
         properties.put("hibernate.hbm2ddl.auto", "update");
@@ -47,7 +45,8 @@ public class RealDBConfig {
 
     @Bean
     public PlatformTransactionManager realTransactionManager() {
-
-        return new DataSourceTransactionManager(realDBSource());
+        JpaTransactionManager transactionManager = new JpaTransactionManager();
+        transactionManager.setEntityManagerFactory(realEntityManager().getObject());
+        return transactionManager;
     }
 }
