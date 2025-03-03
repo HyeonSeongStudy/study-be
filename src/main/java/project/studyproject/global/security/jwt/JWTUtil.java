@@ -111,7 +111,7 @@ public class JWTUtil {
                 .compact();
     }
 
-    // 토큰츄츌
+    // 토큰에서 앞의 값만 가져옴
     public String resolveToken(HttpServletRequest request) {
         String bearerToken = request.getHeader("access");
         if (bearerToken != null && bearerToken.startsWith("Bearer ")) {

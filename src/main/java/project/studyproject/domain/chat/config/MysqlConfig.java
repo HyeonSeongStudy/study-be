@@ -38,8 +38,8 @@ public class MysqlConfig {
         LocalContainerEntityManagerFactoryBean em = new LocalContainerEntityManagerFactoryBean();
 
         em.setDataSource(mysqlDataSource());
-        em.setPackagesToScan(new String[]{"project.studyproject.domain.User.entity",
-                "project.studyproject.domain.file.entity"});
+        em.setPackagesToScan(new String[]{"project.studyproject.domain.User.entity"
+                                            ,"project.studyproject.domain.file.entity"});
 
         em.setJpaVendorAdapter(new HibernateJpaVendorAdapter());
         em.setPersistenceUnitName("mysqlPersistenceUnit");
