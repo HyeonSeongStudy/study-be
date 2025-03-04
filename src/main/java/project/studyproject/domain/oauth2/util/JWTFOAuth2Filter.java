@@ -29,6 +29,8 @@ public class JWTFOAuth2Filter extends OncePerRequestFilter {
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
 
         //cookie들을 불러온 뒤 Authorization Key에 담긴 쿠키를 찾음
+        // 애초에 OAuth2에서 헤더에 값을 받아오는데 쿠키에서 값을 받아오면 안됨
+        // 여기서 resolve 토큰 추출
         String authorization = null;
         Cookie[] cookies = request.getCookies();
         for (Cookie cookie : cookies) {
@@ -42,18 +44,26 @@ public class JWTFOAuth2Filter extends OncePerRequestFilter {
 
         // 헤더 검증
 
+
+        // access 토큰으로 리소스 서버에 사용자 정보를 요청
+        // 리소스 서버로 부터 받은 사용자 정보를 DB에 저장
+
         //토큰
         // 쿠키에서 가져온 토큰 값임
+        // 토큰 정보 authorizationdp 넣은 상태
         String token = authorization;
 
 
+        // 해당 인가서버에서 받은 토큰에서 가져오고 username이랑 role 추출
         //토큰에서 username과 role 획득
         String username = jwtUtil.getUsername(token);
         Role role = jwtUtil.getRole(token);
 
+        // OAuth2 엔티티에 저장하고
         User aUser = User.oauth2From(username, "", role);
 
         //userDTO를 생성하여 값 set
+        // DTO로 값 전송
         UserInfo user = UserInfo.of(aUser);
 
         //UserDetails에 회원 정보 객체 담기

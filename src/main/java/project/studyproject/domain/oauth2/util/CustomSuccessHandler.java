@@ -29,6 +29,9 @@ public class CustomSuccessHandler extends SimpleUrlAuthenticationSuccessHandler 
     @Override
     public void onAuthenticationSuccess(HttpServletRequest request, HttpServletResponse response, Authentication authentication) throws  ServletException, IOException {
         //OAuth2User
+        // Local, OAuth2 구분
+        // OAuth2 Handler 상속
+
         CustomOAuth2User customUserDetails = (CustomOAuth2User) authentication.getPrincipal();
 
         String username = customUserDetails.getUsername();

@@ -119,4 +119,9 @@ public class JWTUtil {
         }
         return null;
     }
+
+    // 아래 OAuth2 관련 서비스 로직
+
+
+
 }
