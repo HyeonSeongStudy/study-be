@@ -45,7 +45,7 @@ public class User  {
                 .build();
     }
 
-    public static User oauth2From (String username, String name, Role role){
+    public static User oauth2From (String username,String name, Role role){
         return User.builder()
                 .username(username)
                 .name(name)

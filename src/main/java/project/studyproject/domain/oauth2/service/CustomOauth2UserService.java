@@ -18,6 +18,7 @@ import project.studyproject.domain.User.repository.UserRepository;
 
 // oauth2userservice의 구현체인 default 사용해도됨
 // jwt 사용 시 핸들러가 필수임
+// 여기 이제 OAuth2User 해야함
 @Service
 @Slf4j
 @RequiredArgsConstructor
