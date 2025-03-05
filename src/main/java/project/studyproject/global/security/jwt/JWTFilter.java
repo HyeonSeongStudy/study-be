@@ -24,6 +24,15 @@ public class JWTFilter extends OncePerRequestFilter {
     // 접근 제한자
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
+        // 경로 별로 다른 필터 적용
+        String path = request.getRequestURI();
+        if (path.startsWith("/login") || path.startsWith("/oauth2")) {
+            log.info("[JWTFilter] Skipping JWT validation for path: {}", path);
+            filterChain.doFilter(request, response);
+            return;
+        }
+
+        // 토큰 추출
         String accessToken = jwtUtil.resolveToken(request);
         log.info("[JWTFilter] Extracted token: {}", accessToken);
 

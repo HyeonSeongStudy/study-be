@@ -28,10 +28,7 @@ public class AuthenticationSuccessHandler {
     public void successHandler(HttpServletRequest request, HttpServletResponse response, FilterChain chain, Authentication authentication) {
         CustomUserDetails customUserDetails = (CustomUserDetails) authentication.getPrincipal();
         String username = customUserDetails.getUsername();
-        Collection<? extends GrantedAuthority> authorities = authentication.getAuthorities();
-
-        // 첫 번째 권한 가져오기
-        Role role = Role.valueOf(authorities.stream().findFirst().map(GrantedAuthority::getAuthority).orElse(null));
+        Role role = customUserDetails.getRole();
 
         // 토큰 생성
         String accessToken = jwtUtil.createToken("access", username, role, Type.LOCAL ,60000L);

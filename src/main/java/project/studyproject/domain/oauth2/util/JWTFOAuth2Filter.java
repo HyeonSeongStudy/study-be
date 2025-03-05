@@ -19,6 +19,9 @@ import project.studyproject.global.security.jwt.JWTUtil;
 
 import java.io.IOException;
 
+// JWT 필터 통합할거임
+
+
 @RequiredArgsConstructor
 @Component
 public class JWTFOAuth2Filter extends OncePerRequestFilter {
@@ -27,6 +30,14 @@ public class JWTFOAuth2Filter extends OncePerRequestFilter {
 
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
+
+        String path = request.getRequestURI();
+
+        // 인증이 필요 없는 경로는 필터를 건너뜀
+        if (path.startsWith("/signUp") || path.startsWith("/login") || path.startsWith("/oauth2/")) {
+            filterChain.doFilter(request, response);
+            return;
+        }
 
         //cookie들을 불러온 뒤 Authorization Key에 담긴 쿠키를 찾음
         // 애초에 OAuth2에서 헤더에 값을 받아오는데 쿠키에서 값을 받아오면 안됨

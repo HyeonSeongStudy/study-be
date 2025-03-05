@@ -3,6 +3,7 @@ package project.studyproject.global.security.auth;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
+import project.studyproject.domain.User.entity.Role;
 import project.studyproject.domain.User.entity.User;
 
 import java.util.ArrayList;
@@ -42,5 +43,12 @@ public class CustomUserDetails implements UserDetails {
     @Override
     public String getUsername() {
         return user.getUsername();
+    }
+
+    /**
+     * 해당 권한 가져오기
+     */
+    public Role getRole() {
+        return user.getRole();
     }
 }

@@ -51,7 +51,6 @@ public class SecurityConfig {
     private final CustomOAuth2AuthorizedClientService customOAuth2AuthorizedClientService;
     private final JdbcTemplate jdbcTemplate;
     private final CustomSuccessHandler customSuccessHandler;
-    private final JWTFOAuth2Filter jwtOAuth2Filter;
 
     @Bean
     public AuthenticationManager authenticationManagerBean(AuthenticationConfiguration configuration) throws Exception {
@@ -122,7 +121,6 @@ public class SecurityConfig {
                                 .anyRequest().authenticated()
                 )
 
-                .addFilterBefore(new JWTFOAuth2Filter(jwtUtil), UsernamePasswordAuthenticationFilter.class) // 이거를 이제 JWTFilter 쪽에 얹어야함
                 .addFilterBefore(new JWTFilter(jwtUtil), LoginFilter.class)
                 .addFilterAt(new LoginFilter(authenticationManagerBean(authenticationConfiguration), jwtUtil, authenticationSuccessHandler, authenticationFailureHandler, refreshRepository), UsernamePasswordAuthenticationFilter.class)
                 .addFilterBefore(new CustomLogoutFilter(jwtUtil, refreshRepository), LogoutFilter.class); // 로그아웃 시

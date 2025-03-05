@@ -19,6 +19,15 @@ import java.io.IOException;
 import java.util.Collection;
 import java.util.Iterator;
 
+// 성공핸들러 단일 처리 할거임
+
+
+
+
+
+
+
+
 @Component
 @RequiredArgsConstructor
 public class CustomSuccessHandler extends SimpleUrlAuthenticationSuccessHandler {
