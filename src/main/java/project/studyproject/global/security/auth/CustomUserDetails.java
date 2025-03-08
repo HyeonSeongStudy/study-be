@@ -5,12 +5,13 @@ import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 import project.studyproject.domain.User.entity.Role;
 import project.studyproject.domain.User.entity.User;
+import project.studyproject.domain.oauth2.entity.CustomUserPrincipal;
 
 import java.util.ArrayList;
 import java.util.Collection;
 
 @RequiredArgsConstructor
-public class CustomUserDetails implements UserDetails {
+public class CustomUserDetails implements UserDetails, CustomUserPrincipal {
 
     private final User user;
 

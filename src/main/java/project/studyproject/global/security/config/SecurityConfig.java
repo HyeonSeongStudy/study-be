@@ -24,7 +24,6 @@ import project.studyproject.domain.User.repository.RefreshRepository;
 import project.studyproject.domain.oauth2.util.CustomClientRegistrationRepo;
 import project.studyproject.domain.oauth2.util.CustomOAuth2AuthorizedClientService;
 import project.studyproject.domain.oauth2.util.CustomSuccessHandler;
-import project.studyproject.domain.oauth2.util.JWTFOAuth2Filter;
 import project.studyproject.global.security.filter.CustomLogoutFilter;
 import project.studyproject.global.security.handler.AuthenticationFailHandler;
 import project.studyproject.global.security.handler.AuthenticationSuccessHandler;
@@ -103,6 +102,7 @@ public class SecurityConfig {
                 .formLogin(AbstractHttpConfigurer::disable) // 기본 로그인 폼 비활성화 -> UserNamePasswordAuthentication Fileter를 커스텀해야함
                 .oauth2Login(oauth2 -> oauth2
                         .loginPage("/login")
+                        .redirectionEndpoint(redirection -> redirection.baseUri("/login/oauth2/code/{registrationId}"))
                         .clientRegistrationRepository(customClientRegistrationRepo.clientRegistrationRepository()) // yml 파일에 두지 않고 커스텀 형태로 만듬 + 인메모리 형식으로 저장
                         .authorizedClientService(customOAuth2AuthorizedClientService.oAuth2AuthorizedClientService(jdbcTemplate, customClientRegistrationRepo.clientRegistrationRepository())) // 스프링 OAuth2 클라이언트에서 사용자의 Access 토큰이나 정보를 저장하는 OAuth2AuthorizedClientService를 DB 방식으로 구현하는 방법과 중요한 참고 사항
                         .userInfoEndpoint((userInfoEndpointConfig) -> userInfoEndpointConfig.userService(customOauth2UserService)) // 유저 처리

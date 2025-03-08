@@ -15,6 +15,8 @@ import project.studyproject.domain.User.entity.Role;
 import project.studyproject.domain.oauth2.dto.*;
 import project.studyproject.domain.User.entity.User;
 import project.studyproject.domain.User.repository.UserRepository;
+import project.studyproject.domain.oauth2.entity.OAuthUser;
+import project.studyproject.domain.oauth2.repository.OAuthRepository;
 
 // oauth2userservice의 구현체인 default 사용해도됨
 // jwt 사용 시 핸들러가 필수임
@@ -23,7 +25,7 @@ import project.studyproject.domain.User.repository.UserRepository;
 @Slf4j
 @RequiredArgsConstructor
 public class CustomOauth2UserService extends DefaultOAuth2UserService {
-    private final UserRepository userRepository;
+    private final OAuthRepository oAuthRepository;
 
     // 해당 유저 정보 가져오기
     @Override
@@ -48,32 +50,40 @@ public class CustomOauth2UserService extends DefaultOAuth2UserService {
 
         // 서버에서 관리 용이하게 임의로 username을 생성
         String username = oAuth2Response.getProvider()+" "+oAuth2Response.getProviderId();
+        log.info("[username] 유저 네임 : {}", username);
 
         // 이미 저장되어있는 데이터 가져오기
         // 있다면 새롭게 적용, 없다면 새로운 걸 적용
-        User existData = userRepository.getByUsername(username);
+        OAuthUser existData = oAuthRepository.getByUsername(username);
         if (existData == null) {
 
-            User userEntity = User.oauth2From(
-                    username, "", Role.Client
+            OAuthUser entity = OAuthUser.oauth2From(
+                    username, "test", Role.Client
             );
 
-            userRepository.save(userEntity);
+            oAuthRepository.save(entity);
 
-            UserInfo userInfo = UserInfo.of(userEntity);
+            // OAuthUser 을 DTO 형태로 변환
+            UserInfo userInfo = UserInfo.of(entity);
 
+
+            log.info("[CustomOAuth2User] 유저 네임 : {}", userInfo);
             return new CustomOAuth2User(userInfo);
         }
         else {
 
-            existData.setName(username);
-            existData.setUsername(oAuth2Response.getEmail());
+            OAuthUser entity = OAuthUser.oauth2From(
+                    existData.getUsername(), "test", Role.Client
+            );
 
-            userRepository.save(existData);
+            oAuthRepository.save(entity);
 
-            UserInfo userInfo = UserInfo.of(existData);
+            // 엔티티 저장 위해서 + 서비스 로직 수행
+            UserInfo userInfo = UserInfo.of(entity);
 
             //추후 작성
+            // 인터페이스 타입으로 넘겨줄 DTO
+            log.info("[CustomOAuth2User] 유저 네임 : {}", userInfo);
             return new CustomOAuth2User(userInfo);
         }
     }

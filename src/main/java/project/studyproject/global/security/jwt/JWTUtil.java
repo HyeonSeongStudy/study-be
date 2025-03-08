@@ -6,9 +6,13 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
+import org.springframework.security.oauth2.client.userinfo.OAuth2UserRequest;
 import org.springframework.stereotype.Component;
 import project.studyproject.domain.User.entity.Role;
 import project.studyproject.domain.User.entity.Type;
+import project.studyproject.domain.oauth2.dto.CustomOAuth2User;
+import project.studyproject.domain.oauth2.dto.UserInfo;
+import project.studyproject.domain.oauth2.entity.CustomUserPrincipal;
 import project.studyproject.domain.oauth2.service.CustomOauth2UserService;
 import project.studyproject.global.security.auth.CustomUserDetailService;
 import project.studyproject.global.security.auth.CustomUserDetails;
@@ -57,19 +61,35 @@ public class JWTUtil {
         }
     }
 
-    // 토큰 인증 정보 조회 시작
     public Authentication getAuthentication(String token) {
-        log.info("[getAuthentication] 토큰 인증 정보 조회 시작");
-//        if (getType(token).equals(Type.LOCAL)) {
-        CustomUserDetails user = (CustomUserDetails) customUserDetailService.loadUserByUsername(getUsername(token));
-//        } else if (getType(token).equals(Type.OAUTH2)) {
-//            CustomOAuth2User user = (CustomOAuth2User) customOauth2UserService.loadUser(token);
-//        }
+        log.info("[getAuthentication] Token authentication started");
 
-        log.info("[getAuthentication] 토큰 인증 정보 조회 완료, UserName : {}", user.getUsername());
-        return new UsernamePasswordAuthenticationToken(user, "", user.getAuthorities());
+        if (token == null || isExpired(token)) {
+            throw new JwtExceptionHandler("Invalid or expired token");
+        }
+
+        String username = getUsername(token);
+        Type type = getType(token);
+        Role role = getRole(token);
+
+        CustomUserPrincipal principal;
+        if (type == Type.LOCAL) {
+            CustomUserDetails user = (CustomUserDetails) customUserDetailService.loadUserByUsername(username);
+            principal = user;
+        } else if (type == Type.OAUTH2) {
+            UserInfo userInfo = UserInfo.builder()
+                    .username(username)
+                    .role(role)
+                    .name("") // name 필수값이므로 기본값 설정
+                    .build();
+            principal = new CustomOAuth2User(userInfo);
+        } else {
+            throw new JwtExceptionHandler("Unsupported token type: " + type);
+        }
+
+        log.info("[getAuthentication] Token authentication completed, Username: {}", principal.getUsername());
+        return new UsernamePasswordAuthenticationToken(principal, null, principal.getAuthorities());
     }
-
     // 키에서 권한 받아오기
     public Role getRole(String token) {
         try {

@@ -26,9 +26,12 @@ public class AuthenticationSuccessHandler {
     private final TokenResponseUtil tokenResponseUtil;
 
     public void successHandler(HttpServletRequest request, HttpServletResponse response, FilterChain chain, Authentication authentication) {
-        CustomUserDetails customUserDetails = (CustomUserDetails) authentication.getPrincipal();
-        String username = customUserDetails.getUsername();
-        Role role = customUserDetails.getRole();
+        // Local 인지 OAuth2 인지 확인하기 위해 실행
+        Object principal = authentication.getPrincipal();
+
+            CustomUserDetails customUserDetails = (CustomUserDetails) principal;
+            String username = customUserDetails.getUsername();
+            Role role = customUserDetails.getRole();
 
         // 토큰 생성
         String accessToken = jwtUtil.createToken("access", username, role, Type.LOCAL ,60000L);
