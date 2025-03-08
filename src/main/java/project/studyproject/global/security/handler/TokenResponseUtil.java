@@ -78,5 +78,9 @@ public class TokenResponseUtil {
         return refresh;
     }
 
+    public Object getPrincipal(HttpServletRequest request) {
+        return request.getUserPrincipal();
+    }
+
 
 }

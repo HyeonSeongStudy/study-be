@@ -43,9 +43,13 @@ public class JWTFilter extends OncePerRequestFilter {
             return;
         }
 
-        // 토큰 유효성 확인
+
+
+        // 토큰 유효성 확인 ( OAuth2 와 Local을 분리해아함)
         log.info("[JWTFilter] Token validation started.");
         Authentication authentication = jwtUtil.getAuthentication(accessToken);
+
+
 
         // 토큰 유효할 경우 User의 권한을 발급
         if (authentication != null) {
