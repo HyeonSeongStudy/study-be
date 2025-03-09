@@ -85,6 +85,8 @@ dependencies {
     // AOP
     implementation( "org.springframework.boot:spring-boot-starter-aop")
 
+    runtimeOnly("com.mysql:mysql-connector-j")
+
 }
 
 tasks.named('test') {

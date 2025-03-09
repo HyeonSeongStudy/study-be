@@ -22,9 +22,14 @@ public class ApiV1PostDocController {
         return ResponseEntity.ok(postDocService.write(request.title(), request.content()));
     }
 
+    @GetMapping("/searchJpa")
+    public ResponseEntity<List<PostDoc>> find(@RequestParam("keyword") String keyword){
+        return ResponseEntity.ok(postDocService.findByKeyword(keyword));
+    }
+
     @GetMapping("/search")
     public ResponseEntity<List<PostDoc>> search(@RequestParam("keyword") String keyword){
-        return ResponseEntity.ok(postDocService.findByKeyword(keyword));
+        return ResponseEntity.ok(postDocService.searchByKeyword(keyword));
     }
 
 

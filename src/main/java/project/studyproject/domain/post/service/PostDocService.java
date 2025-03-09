@@ -28,4 +28,8 @@ public class PostDocService {
     public List<PostDoc> findByKeyword(String keyword) {
         return postDocRepository.findByTitleContainingOrContentContaining(keyword, keyword);
     }
+
+    public List<PostDoc> searchByKeyword(String keyword) {
+        return postDocRepository.searchByKeyword(keyword);
+    }
 }
