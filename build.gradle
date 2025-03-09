@@ -76,6 +76,15 @@ dependencies {
     // Spring Batch 5
     implementation 'org.springframework.boot:spring-boot-starter-batch'
 
+    // ELK
+    implementation 'org.springframework.boot:spring-boot-starter-data-elasticsearch'
+
+    // UUID
+    implementation("com.github.f4b6a3:tsid-creator:5.2.6")
+
+    // AOP
+    implementation( "org.springframework.boot:spring-boot-starter-aop")
+
 }
 
 tasks.named('test') {
