@@ -23,9 +23,9 @@ services:
     restart: always
     environment:
       MYSQL_ROOT_PASSWORD: root
-      MYSQL_DATABASE: minio_test
-      MYSQL_USER: user
-      MYSQL_PASSWORD: password
+      MYSQL_DATABASE: StudyProject
+      MYSQL_USER: llddlocal
+      MYSQL_PASSWORD: 1234
     ports:
       - "33306:3306"
     volumes:
@@ -40,6 +40,11 @@ services:
       - discovery.type=single-node
       - xpack.security.enabled=false
       - ES_JAVA_OPTS=-Xms2g -Xmx2g
+    command: >
+      bash -c '
+        bin/elasticsearch-plugin install analysis-nori;
+        /usr/local/bin/docker-entrypoint.sh elasticsearch
+      '
     ports:
       - "9200:9200"
       - "9300:9300"
@@ -64,6 +69,9 @@ services:
     container_name: logstash
     environment:
       - LS_JAVA_OPTS=-Xms512m -Xmx512m
+    volumes:
+      - ./logstash/pipeline:/usr/share/logstash/pipeline:ro
+      - ./logstash/lib/mysql-connector-j-9.2.0.jar:/usr/share/logstash/logstash-core/lib/jars/mysql-connector-j-9.2.0.jar:ro
     ports:
       - "5001:5001"
       - "5044:5044"

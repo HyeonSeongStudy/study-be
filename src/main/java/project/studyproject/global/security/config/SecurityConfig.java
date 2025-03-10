@@ -116,7 +116,7 @@ public class SecurityConfig {
                                 .requestMatchers("/swagger", "/swagger-ui.html", "/swagger-ui/**", "/api-docs", "/api-docs/**", "/v3/api-docs/**").permitAll()
                                 .requestMatchers("/signUp", "/reissue").permitAll()
                                 .requestMatchers("/", "/oauth2/**", "/login/**").permitAll()
-                                .requestMatchers("/api/v1/**").permitAll()
+                                .requestMatchers("/api/v1/**", "api/v2/**").permitAll()
                                 .requestMatchers("**exception**").permitAll()
                                 .requestMatchers("/admin").hasRole("ADMIN")
                                 .anyRequest().authenticated()

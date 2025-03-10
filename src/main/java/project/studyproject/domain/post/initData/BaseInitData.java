@@ -18,7 +18,7 @@ public class BaseInitData {
     @Bean
     public ApplicationRunner baseInitDataApplicationRunner() {
         return args -> {
-            work1();
+    //        work1();
             work2();
         };
     }
