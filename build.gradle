@@ -93,6 +93,9 @@ dependencies {
     // Swagger
     implementation 'org.springdoc:springdoc-openapi-starter-webmvc-ui:2.0.2'
 
+    // JSON
+    implementation 'org.json:json:20231013'
+
 }
 
 tasks.named('test') {
