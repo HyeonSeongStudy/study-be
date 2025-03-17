@@ -80,6 +80,23 @@ services:
     networks:
       - minio_net
 
+  api_gateway:
+    image: nginx
+    container_name: nginx
+    volumes:
+      - ./nginx/nginx.conf:/etc/nginx/nginx.conf
+      - ./nginx/conf.d/:/etc/nginx/conf.d
+    ports:
+      - 8080:80
+    networks:
+      - minio_net
+
+  server1:
+    build: ./server1
+  server2:
+    build: ./server2
+
+
 volumes:
   mysql_data:
   minio_data:
